@@ -9,6 +9,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,9 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Weathering extends JavaPlugin{
 	public final Logger log = Logger.getLogger("Minecraft");
-	
-	private FileManager fileManager = new FileManager();
-
+	FileConfiguration config = null;
 	PluginDescriptionFile plugdisc;
 
 	int cs_chance, cs_nearbychance, sb_chance, sb_mossychance, sb_nearbymossychance, sb_nearbybrickedchance;
@@ -39,7 +38,8 @@ public class Weathering extends JavaPlugin{
 	@Override
 	public void onEnable() 
 	{
-		fileManager.createConfig();
+		config = this.getConfig();
+		loadConfig();
 		
 		plugdisc = this.getDescription();
 		
@@ -47,12 +47,12 @@ public class Weathering extends JavaPlugin{
 
 		try
 		{
-			cs_chance = Integer.parseInt(fileManager.readString("CobbleStone.Chance"));
-			cs_nearbychance = Integer.parseInt(fileManager.readString("CobbleStone.nearby_Chance"));
-			sb_chance = Integer.parseInt(fileManager.readString("Stonebricks.Chance"));
-			sb_mossychance = Integer.parseInt(fileManager.readString("Stonebricks.mossy_Chance"));
-			sb_nearbymossychance = Integer.parseInt(fileManager.readString("Stonebricks.nearby_mossyChance"));
-			sb_nearbybrickedchance = Integer.parseInt(fileManager.readString("Stonebricks.nearby_brickedChance"));
+			cs_chance = config.getInt("CobbleStone.Chance");
+			cs_nearbychance = config.getInt("CobbleStone.nearby_Chance");
+			sb_chance = config.getInt("Stonebricks.Chance");
+			sb_mossychance = config.getInt("Stonebricks.mossy_Chance");
+			sb_nearbymossychance = config.getInt("Stonebricks.nearby_mossyChance");
+			sb_nearbybrickedchance = config.getInt("Stonebricks.nearby_brickedChance");
 		}
 		catch(NumberFormatException e)
 		{
@@ -276,12 +276,16 @@ public class Weathering extends JavaPlugin{
 		
 		return succeed;
 	}
-	/*for (int dx = startX; dx < endX; dx++) {
-	    for (int dy = startY; dy < endY; dy++) {
-	        for (int dz = startZ; dz < endZ; dz++) {
-	            Block block = world.getBlockAt(dx, dy, dz);
-	            //do stuff
-	        }
-	    }
-	}*/
+	
+	public void loadConfig()
+	{
+		config.addDefault("CobbleStone.Chance", 40);
+		config.addDefault("CobbleStone.nearby_Chance", 30);
+		config.addDefault("Stonebricks.Chance", 30);
+		config.addDefault("Stonebricks.mossy_Chance", 50);
+		config.addDefault("Stonebricks.nearby_mossyChance", 30);
+		config.addDefault("Stonebricks.nearby_brickedChance", 30);
+		config.options().copyDefaults(true);
+		saveConfig();
+	}
 }
